@@ -6,11 +6,14 @@ const rl = readline.createInterface({
 	output: process.stdout,
 });
 
-
 async function download(url) {
-	const songname = await ytdl.getInfo(url);
-	console.log('Starting Download on ' + songname.videoDetails.title);
-	const writeableStream = fs.createWriteStream(`export/${songname.videoDetails.title}.mp4`);
+	const songinfo = await ytdl.getInfo(url);
+	console.log('Starting Download on ' + songinfo.videoDetails.title);
+	fs.writeFile('export/' + songinfo.videoDetails.title + '.txt', ` Video owners profile: ${songinfo.videoDetails.ownerProfileUrl} \n Views: ${songinfo.videoDetails.viewCount}\n Likes: ${songinfo.videoDetails.likes}\n Dislikes: ${songinfo.videoDetails.dislikes}\n Video URL: ${songinfo.videoDetails.video_url}\n Video Thumbnail: ${songinfo.videoDetails.thumbnails[4].url} \n Description: \n\n${songinfo.videoDetails.description}`, function(err) {
+		if (err) return console.log(err);
+	});
+
+	const writeableStream = fs.createWriteStream(`export/${songinfo.videoDetails.title}.mp4`);
 	ytdl(url, {
 		format: 'mp4',
 	}).pipe(writeableStream);
