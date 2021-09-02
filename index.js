@@ -8,12 +8,16 @@ const rl = readline.createInterface({
 
 async function download(url) {
 	const songinfo = await ytdl.getInfo(url);
-	console.log('Starting Download on ' + songinfo.videoDetails.title);
-	fs.writeFile('export/' + songinfo.videoDetails.title + '.txt', ` Video owners profile: ${songinfo.videoDetails.ownerProfileUrl} \n Views: ${songinfo.videoDetails.viewCount}\n Likes: ${songinfo.videoDetails.likes}\n Dislikes: ${songinfo.videoDetails.dislikes}\n Video URL: ${songinfo.videoDetails.video_url}\n Video \n Description: \n\n${songinfo.videoDetails.description}`, function(err) {
+	const title = songinfo.videoDetails.title;
+	const afterReg = title.replace(/[^a-z0-9]/gi, ' ');
+
+	console.log('Starting Download on ' + afterReg);
+	fs.writeFile('export/' + afterReg + '.txt', ` Video owners profile: ${songinfo.videoDetails.ownerProfileUrl} \n Views: ${songinfo.videoDetails.viewCount}\n Likes: ${songinfo.videoDetails.likes}\n Dislikes: ${songinfo.videoDetails.dislikes}\n Video URL: ${songinfo.videoDetails.video_url}\n Video \n Description: \n\n${songinfo.videoDetails.description}`, function(err) {
 		if (err) return console.log(err);
 	});
 
-	const writeableStream = fs.createWriteStream(`export/${songinfo.videoDetails.title}.mp4`);
+	const writeableStream = fs.createWriteStream(`export/${afterReg}.mp4`);
+	
 	ytdl(url, {
 		format: 'mp4',
 	}).pipe(writeableStream);
@@ -21,6 +25,7 @@ async function download(url) {
 	writeableStream.on('finish', () => {
 		rl.close();
 	});
+
 }
 
 
